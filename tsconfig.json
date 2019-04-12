@@ -1,0 +1,20 @@
+{
+	"compilerOptions": {
+    	"noImplicitAny": true,
+		"suppressImplicitAnyIndexErrors": true,
+		"target": "es5",
+		"moduleResolution": "node",
+        "removeComments": false,
+		"experimentalDecorators": true,
+		"noImplicitReturns": true,
+		"noUnusedLocals": true,
+		"noImplicitThis": true,
+		"alwaysStrict": true,
+		"strictBindCallApply": true,
+		"strictNullChecks": true,
+		"forceConsistentCasingInFileNames": true,
+		"baseUrl": ".",
+		"sourceMap": true,
+        "jsx": "react"
+    }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "3minus.jobs",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:AdamT213/3minus.jobs.git",
+  "author": "Adam Tropp <adt6261@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@types/react": "^16.8.13",
+    "@zeit/next-typescript": "^1.1.1",
+    "emotion": "^10.0.9",
+    "jest": "^24.7.1",
+    "next": "^8.0.4",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6"
+  },
+  "scripts": {
+    "dev": "next ./src",
+    "build": "next build ./src",
+    "start": "next start ./src",
+    "test": "jest",
+    "initial": "tslint --init"
+  },
+  "devDependencies": {
+    "@babel/preset-typescript": "^7.3.3",
+    "tslint": "^5.15.0",
+    "typescript": "^3.4.3"
+  }
+}
