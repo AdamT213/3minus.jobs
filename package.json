@@ -32,6 +32,8 @@
     "@types/cheerio": "^0.22.11",
     "@types/jsdom": "^12.2.3",
     "@types/node": "^11.13.4",
+    "jsdom-devtools-formatter": "^1.0.0",
+    "prettier": "^1.17.0",
     "tslint": "^5.15.0",
     "typescript": "^3.4.3",
     "typescript-tslint-plugin": "^0.3.1"

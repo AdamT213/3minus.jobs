@@ -13,7 +13,7 @@
 		"no-unused-expression": true,
 		"no-var-keyword": true,
 		"number-literal-format": true,
-		"curly": true,
+		"curly": [true, "ignore-same-line"],
 		"class-name": true,
 		"label-position": true,
 		"semicolon": [
