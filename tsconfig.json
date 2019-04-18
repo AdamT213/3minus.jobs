@@ -1,8 +1,22 @@
 {
 	"compilerOptions": {
+		"esModuleInterop": true,
     	"noImplicitAny": true,
 		"suppressImplicitAnyIndexErrors": true,
 		"target": "es5",
+		"lib": [
+			"dom",
+			"es5",
+			"es2015"
+		],
+		"plugins": [
+			{ "name": "typescript-tslint-plugin",
+				"alwaysShowRuleFailuresAsWarnings": true,
+				"ignoreDefinitionFiles": true,
+				"configFile": "./tslint.json",
+				"suppressWhileTypeErrorsPresent": false,
+				"mockTypeScriptVersion": false }
+		  ],
 		"moduleResolution": "node",
         "removeComments": false,
 		"experimentalDecorators": true,
