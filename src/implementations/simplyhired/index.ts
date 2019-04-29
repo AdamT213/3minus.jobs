@@ -1,25 +1,43 @@
-import { JSDOM } from "jsdom";
-import { isHTMLElement } from "../../domutils";
-import * as jsdomDevtoolsFormatter from "jsdom-devtools-formatter";
-
-jsdomDevtoolsFormatter.install();
+import * as puppeteer from "puppeteer";
 
 class SimplyHired {
-  constructor(results: HTMLElement[] = []) {
+  constructor(results: puppeteer.ElementHandle<Element>[] = []) {
     this.results = results;
   }
 
-  results: HTMLElement[];
+  results: puppeteer.ElementHandle<Element>[];
 
-  async getInitialPage(): Promise<Document | undefined> {
+  async getInitialPage(url: string): Promise<void> {
     try {
-      // ***TODO make sure this URL is universally relevant*** //
-      const dom = await JSDOM.fromURL(
-        "https://www.simplyhired.com/search?q=software+developer&fdb=30&pp=&job=JRM04OtDHCjzg0x7zZzy1l0yGf_LHNxfulInltgQXkPOEx0nA7El7Q",
-        { runScripts: "dangerously" }
+      const browser = await puppeteer.launch({
+        headless: false
+      });
+      const page = await browser.newPage();
+      await page.goto(url);
+      const jobs: puppeteer.ElementHandle<Element>[] = await page.$$(
+        "#content > div.wrap > div > div > div.tp-left.TwoPane-PaneHolder.LeftPaneHolder > div > div.jobs > div"
       );
-      const document = dom.window.document;
-      return document;
+      for (let i = 0; i < jobs!.length; i++) {
+        const selected: puppeteer.ElementHandle<Element> = jobs![i];
+        const className = await selected.getProperty("className");
+        // ***TODO: Could potentially make this check more durable***
+        if (className._remoteObject.value !== "SalaryContentCard") {
+          await selected.click();
+          const selector =
+            "#search > div:nth-child(23) > div > div.rpContent.ViewJob > div.viewjob-content > div:nth-child(1) > div > div.viewjob-description.ViewJob-description";
+          await page.waitForFunction(
+            selector => !!document.querySelector(selector),
+            {},
+            selector
+          );
+          const job: puppeteer.ElementHandle<Element> | null = await page.$(
+            "#search > div:nth-child(23) > div > div.rpContent.ViewJob > div.viewjob-content > div:nth-child(1) > div > div.viewjob-description.ViewJob-description"
+          );
+          console.log(!!job);
+          if (job && this.determineRelevance(job)) this.results.push(job);
+        }
+      }
+      browser.close();
     } catch (error) {
       console.error(error);
       return undefined;
@@ -31,15 +49,14 @@ class SimplyHired {
       const jobs: HTMLElement | null = doc.querySelector(
         "#content > div.wrap > div > div > div.tp-left.TwoPane-PaneHolder.LeftPaneHolder > div > div.jobs"
       );
+      debugger;
       for (let i = 0; i < jobs!.children.length; i++) {
         if (jobs!.children[i] && isHTMLElement(jobs!.children[i])) {
           const selected: HTMLElement = jobs!.children[i] as HTMLElement;
           await selected.click();
-          // ***TODO right pane seems to be loaded separately from left pain. Will need to poll for presence of children in right pane somehow*** //
-          const job: any = doc.querySelector(
+          const job: HTMLElement | null = doc.querySelector(
             "#search > div:nth-child(23) > div > div.rpContent.ViewJob > div.viewjob-content > div:nth-child(1) > div > div.viewjob-description.ViewJob-description"
           );
-          debugger;
           console.log(job);
           if (job && this.determineRelevance(job)) this.results.push(job);
         }
@@ -49,7 +66,9 @@ class SimplyHired {
     }
   }
 
-  async determineRelevance(job: HTMLElement | null): Promise<boolean> {
+  async determineRelevance(
+    job: puppeteer.ElementHandle<Element> | null
+  ): Promise<boolean> {
     return false;
   }
 }
@@ -57,8 +76,8 @@ class SimplyHired {
 export default new SimplyHired();
 
 const scraper = new SimplyHired();
-const content = scraper.getInitialPage().then(content => {
-  scraper.scrapeJobInfo(content!);
-});
+const content = scraper.getInitialPage(
+  "https://www.simplyhired.com/search?q=software+developer&fdb=30&pp=&job=JRM04OtDHCjzg0x7zZzy1l0yGf_LHNxfulInltgQXkPOEx0nA7El7Q"
+);
 
 console.log(content);

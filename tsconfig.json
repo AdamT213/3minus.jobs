@@ -1,34 +1,32 @@
 {
-	"compilerOptions": {
-		"esModuleInterop": true,
-    	"noImplicitAny": true,
-		"suppressImplicitAnyIndexErrors": true,
-		"target": "es5",
-		"lib": [
-			"dom",
-			"es5",
-			"es2015"
-		],
-		"plugins": [
-			{ "name": "typescript-tslint-plugin",
-				"alwaysShowRuleFailuresAsWarnings": true,
-				"ignoreDefinitionFiles": true,
-				"configFile": "./tslint.json",
-				"suppressWhileTypeErrorsPresent": false,
-				"mockTypeScriptVersion": false }
-		  ],
-		"moduleResolution": "node",
-        "removeComments": false,
-		"experimentalDecorators": true,
-		"noImplicitReturns": true,
-		"noUnusedLocals": true,
-		"noImplicitThis": true,
-		"alwaysStrict": true,
-		"strictBindCallApply": true,
-		"strictNullChecks": true,
-		"forceConsistentCasingInFileNames": true,
-		"baseUrl": ".",
-		"sourceMap": true,
-        "jsx": "react"
-    }
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "noImplicitAny": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "target": "es2018",
+    "lib": ["dom", "es5", "es2015", "es2018"],
+    "plugins": [
+      {
+        "name": "typescript-tslint-plugin",
+        "alwaysShowRuleFailuresAsWarnings": true,
+        "ignoreDefinitionFiles": true,
+        "configFile": "./tslint.json",
+        "suppressWhileTypeErrorsPresent": false,
+        "mockTypeScriptVersion": false
+      }
+    ],
+    "moduleResolution": "node",
+    "removeComments": false,
+    "experimentalDecorators": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "strictBindCallApply": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "sourceMap": true,
+    "jsx": "react"
+  }
 }
