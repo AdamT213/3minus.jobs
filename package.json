@@ -27,12 +27,14 @@
     "test": "jest",
     "lint": "tslint --project tsconfig.json",
     "initial": "tslint --init",
+    "jestinit": "jest --init",
     "clean": "find src/*/ -type f  -name index.js  -delete"
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.3.3",
     "@types/cheerio": "^0.22.11",
     "@types/node": "^11.13.4",
+    "jest-puppeteer": "^4.1.1",
     "jsdom-devtools-formatter": "^1.0.0",
     "prettier": "^1.17.0",
     "tslint": "^5.15.0",

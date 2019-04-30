@@ -1,21 +1,47 @@
 import * as puppeteer from "puppeteer";
 
 class SimplyHired {
-  constructor(results: puppeteer.ElementHandle<Element>[] = []) {
+  constructor(
+    results: puppeteer.ElementHandle<Element>[] = [],
+    url = "https://www.simplyhired.com/search?q=software+developer&fdb=30&pp=&job=JRM04OtDHCjzg0x7zZzy1l0yGf_LHNxfulInltgQXkPOEx0nA7El7Q",
+    jobsSelector = "#content > div.wrap > div > div > div.tp-left.TwoPane-PaneHolder.LeftPaneHolder > div > div.jobs > div",
+    selectedJobSelector = "#search > div:nth-child(23) > div > div.rpContent.ViewJob > div.viewjob-content > div:nth-child(1) > div > div.viewjob-description.ViewJob-description",
+    page = 1
+  ) {
     this.results = results;
+    this.url = url;
+    this.jobsSelector = jobsSelector;
+    this.selectedJobSelector = selectedJobSelector;
+    this.page = page;
   }
 
-  results: puppeteer.ElementHandle<Element>[];
+  private results: puppeteer.ElementHandle<Element>[];
 
-  async getInitialPage(url: string): Promise<void> {
+  getResults(): puppeteer.ElementHandle<Element>[] {
+    return this.results;
+  }
+
+  page: number;
+  readonly url: string;
+  readonly jobsSelector: string;
+  readonly selectedJobSelector: string;
+
+  async getInitialPage(url: string = this.url): Promise<void> {
     try {
-      const browser = await puppeteer.launch({
-        headless: false
-      });
+      const browser = await puppeteer.launch();
       const page = await browser.newPage();
       await page.goto(url);
+      await this.scrapeJobInfo(page);
+      browser.close();
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async scrapeJobInfo(page: puppeteer.Page): Promise<void> {
+    try {
       const jobs: puppeteer.ElementHandle<Element>[] = await page.$$(
-        "#content > div.wrap > div > div > div.tp-left.TwoPane-PaneHolder.LeftPaneHolder > div > div.jobs > div"
+        this.jobsSelector
       );
       for (let i = 0; i < jobs!.length; i++) {
         const selected: puppeteer.ElementHandle<Element> = jobs![i];
@@ -23,44 +49,20 @@ class SimplyHired {
         // ***TODO: Could potentially make this check more durable***
         if (className._remoteObject.value !== "SalaryContentCard") {
           await selected.click();
-          const selector =
-            "#search > div:nth-child(23) > div > div.rpContent.ViewJob > div.viewjob-content > div:nth-child(1) > div > div.viewjob-description.ViewJob-description";
+          const selector = this.selectedJobSelector;
           await page.waitForFunction(
             selector => !!document.querySelector(selector),
             {},
             selector
           );
           const job: puppeteer.ElementHandle<Element> | null = await page.$(
-            "#search > div:nth-child(23) > div > div.rpContent.ViewJob > div.viewjob-content > div:nth-child(1) > div > div.viewjob-description.ViewJob-description"
+            selector
           );
           console.log(!!job);
           if (job && this.determineRelevance(job)) this.results.push(job);
         }
       }
-      browser.close();
-    } catch (error) {
-      console.error(error);
-      return undefined;
-    }
-  }
-
-  async scrapeJobInfo(doc: Document): Promise<void> {
-    try {
-      const jobs: HTMLElement | null = doc.querySelector(
-        "#content > div.wrap > div > div > div.tp-left.TwoPane-PaneHolder.LeftPaneHolder > div > div.jobs"
-      );
-      debugger;
-      for (let i = 0; i < jobs!.children.length; i++) {
-        if (jobs!.children[i] && isHTMLElement(jobs!.children[i])) {
-          const selected: HTMLElement = jobs!.children[i] as HTMLElement;
-          await selected.click();
-          const job: HTMLElement | null = doc.querySelector(
-            "#search > div:nth-child(23) > div > div.rpContent.ViewJob > div.viewjob-content > div:nth-child(1) > div > div.viewjob-description.ViewJob-description"
-          );
-          console.log(job);
-          if (job && this.determineRelevance(job)) this.results.push(job);
-        }
-      }
+      this.generateNextPage();
     } catch (error) {
       console.error(error);
     }
@@ -71,13 +73,27 @@ class SimplyHired {
   ): Promise<boolean> {
     return false;
   }
+
+  generateNextPage(): void {
+    this.getInitialPage(
+      `https://www.simplyhired.com/search?q=software+developer&amp;fdb=30&amp;pn=${++this
+        .page}&amp;from=pagination&amp;pp=ABYAAAAAAAAAAAAAAAFglh9tAQEBCQO2TqjeeMs0pmLjOHwtkr6yHwI8LY35iFh4hGz6SDr4zyYBOtDDuSP8SRFkTrk9t1PI_w`
+    );
+  }
 }
 
 export default new SimplyHired();
 
-const scraper = new SimplyHired();
-const content = scraper.getInitialPage(
-  "https://www.simplyhired.com/search?q=software+developer&fdb=30&pp=&job=JRM04OtDHCjzg0x7zZzy1l0yGf_LHNxfulInltgQXkPOEx0nA7El7Q"
-);
+// const scraper = new SimplyHired();
+// const content = scraper.getInitialPage();
 
-console.log(content);
+// console.log(content);
+
+// const somethingSmellsLikeFart = async () => {
+//   const browser = await puppeteer.launch();
+//   const page = await browser.newPage();
+//   console.log("OH MY GOD MIA THATS DISGUSTING I CANT BREATHE!");
+//   await page.goto("https://miafarted.com");
+// };
+
+// somethingSmellsLikeFart();

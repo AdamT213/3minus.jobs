@@ -1,10 +1,7 @@
-import SimplyHired from './index';
+import SimplyHired from "./index";
 
-it('scrapes a valid and current URL', async() => { 
-    const testContent = await SimplyHired.getInitialPage();
-    expect(testContent).toBeDefined();
+jest.setTimeout(10000);
+
+it("scrapes a valid and current URL", async () => {
+  await expect(page.goto(SimplyHired.url)).resolves.not.toThrow();
 });
-// it('returns a list of jobs', () => { 
-//     const jobs = SimplyHired.scrapeJobInfo(testContent!);
-//     expect(jobs.length).toBeGreaterThan(10);
-// });
