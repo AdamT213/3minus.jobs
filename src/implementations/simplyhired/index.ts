@@ -2,8 +2,6 @@ import * as puppeteer from "puppeteer";
 import * as fs from "fs";
 import JobDescription from "../../classifier/JobDescription";
 
-// ***TODO*** Currently, all subsequent pages are leading back to first page
-
 class SimplyHired {
   constructor(
     data: JobDescription[] = [],
@@ -38,23 +36,37 @@ class SimplyHired {
     url: string = this.url,
     classifierTraining: Boolean = false
   ): Promise<void> {
+    const browser = await puppeteer.launch();
     try {
-      const browser = await puppeteer.launch({ headless: false });
       const page = await browser.newPage();
       await page.goto(url);
       await this.scrapeJobInfo(page, classifierTraining);
       await browser.close();
-      if (this.page < 4) {
+      //*** Pages give 20 results despite saying they only give 10. Once all content has been seen, new pages will keep loading, but will show the same previously seen content, so, stopping point can be adjusted to be ~# of jobs/20
+      if (this.page < 1350) {
         await this.getPage(
           `https://www.simplyhired.com/search?q=software+developer&fdb=30&pn=${++this
             .page}`,
           classifierTraining
         );
       } else {
-        console.log(this.data);
-        // await this.writeDataToFile();
+        console.log(this.data.length);
+        await this.writeDataToFile();
       }
     } catch (error) {
+      if (error.message.match(/net::ERR_INTERNET_DISCONNECTED/)) {
+        await browser.close();
+        setTimeout(
+          () =>
+            this.getPage(
+              `https://www.simplyhired.com/search?q=software+developer&fdb=30&pn=${
+                this.page
+              }`,
+              classifierTraining
+            ),
+          500
+        );
+      }
       console.error(error);
     }
   }
